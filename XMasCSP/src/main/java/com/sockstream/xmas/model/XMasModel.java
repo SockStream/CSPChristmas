@@ -81,6 +81,9 @@ public class XMasModel {
 		//assuming p1 and p3 are in a relationship
 		p1.setMoitie(p3);
 		p3.setMoitie(p1);
+		
+		//adding previous updates from past christmas
+		p2.getPreviousMates().add(p1);
 
 		int[] possibleValues = new int[mParticipantList.size()];
 		int index = 0;
