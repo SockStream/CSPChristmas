@@ -46,7 +46,6 @@ public class XMasModel {
 	}
 
 	public void loadOptions(String[] args) {
-		// TODO Auto-generated method stub
 		Options options = new Options();
 		
 		Option test = new Option("t", "test", false, "test and display result");
