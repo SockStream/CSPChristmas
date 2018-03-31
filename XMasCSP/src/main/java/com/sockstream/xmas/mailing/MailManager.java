@@ -10,11 +10,15 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.sockstream.xmas.model.Participant;
 
 public class MailManager {
 	private static String PASSWORD = "GmailPassword";
 	private static String USER_NAME = "GmailLogin"; //without@gmail.com
+	private static Logger mLOGGER = LogManager.getLogger(MailManager.class);
 	
 	private MailManager() {
 	}
@@ -66,10 +70,10 @@ public class MailManager {
             transport.close();
         }
         catch (AddressException ae) {
-            ae.printStackTrace();
+            mLOGGER.error(ae);
         }
         catch (MessagingException me) {
-            me.printStackTrace();
+            mLOGGER.error(me);
         }
 	}
 }
