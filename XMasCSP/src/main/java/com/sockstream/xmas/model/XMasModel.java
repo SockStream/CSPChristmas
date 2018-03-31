@@ -65,7 +65,7 @@ public class XMasModel {
 		}
 		catch (ParseException e)
 		{
-			System.out.println(e.getMessage());
+			mLOGGER.error(e);
 			formatter.printHelp("utility-name", options);
 			
 			System.exit(1);
@@ -121,13 +121,12 @@ public class XMasModel {
 	}
 
 	public Model getModel() {
-		// TODO Auto-generated method stub
 		return mModel; 
 	}
 
 	public void solve() throws ExecutionException {
 		List<Solution> solutionList = mModel.getSolver().findAllSolutions();
-		System.out.println(solutionList.size() + " solutions trouvées");
+		mLOGGER.info(solutionList.size() + " solutions trouvées");
 		while (solutionList.isEmpty())
 		{
 			removeOlderMates();
@@ -141,7 +140,6 @@ public class XMasModel {
 	}
 	
 	private void removeOlderMates() throws ExecutionException {
-		
 		int max = 0;
 		for (Participant personne : mParticipantList)
 		{
@@ -162,7 +160,6 @@ public class XMasModel {
 	}
 
 	public boolean isTesting() {
-		// TODO Auto-generated method stub
 		return mTest;
 	}
 
@@ -189,7 +186,6 @@ public class XMasModel {
 	}
 
 	public void sendMails() {
-		// TODO Auto-generated method stub
 		for (Participant personne : mParticipantList)
 		{
 			
@@ -201,12 +197,10 @@ public class XMasModel {
 	}
 
 	public boolean isTestingMails() {
-		// TODO Auto-generated method stub
 		return mMailTest;
 	}
 
 	public void sendTestMails() {
-		// TODO Auto-generated method stub
 		for (Participant personne : mParticipantList)
 		{
 			MailManager.sendTestMailTo(personne);

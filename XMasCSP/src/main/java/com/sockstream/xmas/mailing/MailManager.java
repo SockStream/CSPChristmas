@@ -27,7 +27,6 @@ public class MailManager {
 	}
 
 	public static void sendXMasMails(Participant personne) {
-		Participant match = personne.getPreviousMates().get(personne.getPreviousMates().size()-1);
 		String subject = "mail subject";
 		String body = "mailBody";
 		publishMail(personne.getMail(), subject, body);
