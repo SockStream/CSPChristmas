@@ -1,4 +1,4 @@
-package com.sockstream.xmas.xmascsp;
+package com.sockstream.xmas.XMasCSP;
 import com.sockstream.xmas.model.XMasModel;
 
 public class App 
@@ -26,5 +26,6 @@ public class App
     	{
     		model.sendMails();
     	}
+    	
     }
 }

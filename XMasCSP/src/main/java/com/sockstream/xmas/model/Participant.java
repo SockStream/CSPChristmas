@@ -27,13 +27,13 @@ public class Participant {
 		compteur ++;
 	}
 
-	public Participant(int id, String nom, String prenom, String mail) {
+	public Participant(int Id, String nom, String prenom, String mail) {
 		mNom = nom;
 		mPrenom = prenom;
 		mMail = mail;
 		mMoitie = null;
 		mPreviousMates = new ArrayList<Participant>();
-		mId = XMasModel.getInstance().getModel().intVar(id);
+		mId = XMasModel.getInstance().getModel().intVar(Id);
 	}
 
 	/**

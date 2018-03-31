@@ -1,6 +1,7 @@
 package com.sockstream.xmas.mailing;
 
 import java.util.Properties;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -9,24 +10,28 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.sockstream.xmas.model.Participant;
 
 public class MailManager {
+	private static String PASSWORD = "GmailPassword";
+	private static String USER_NAME = "GmailLogin"; //without@gmail.com
 	
-	private static String PASSWORD = "lesjoiesducode";
-	private static String USER_NAME = "clement.beze";
-	private static Logger mLogger = LogManager.getLogger(MailManager.class);
-
-	private MailManager() {
-	}
 	
 	public static void sendTestMailTo(Participant personne) {
+		// TODO Auto-generated method stub
+		
 		String subject = "mail Test";
 		String body = "this is a test";
+		
 		publishMail(personne.getMail(),subject,body);
+	}
+
+	public static void sendXMasMails(Participant personne) {
+		// TODO Auto-generated method stub
+		Participant match = personne.getPreviousMates().get(personne.getPreviousMates().size()-1);
+		String subject = "mail subject";
+		String body = "mailBody";
+		publishMail(personne.getMail(), subject, body);
 	}
 
 	private static void publishMail(String destinataire, String subject, String body) {
@@ -41,15 +46,20 @@ public class MailManager {
 		
 		Session session = Session.getDefaultInstance(properties);
 		MimeMessage message = new MimeMessage(session);
+		
 		try {
 			message.setFrom(new InternetAddress(USER_NAME));
 			InternetAddress[] toAddress = new InternetAddress[1];
+
+            // To get the array of addresses
             for( int i = 0; i < toAddress.length; i++ ) {
                 toAddress[i] = new InternetAddress(destinataire);
             }
+
             for( int i = 0; i < toAddress.length; i++) {
                 message.addRecipient(Message.RecipientType.TO, toAddress[i]);
             }
+
             message.setSubject(subject);
             message.setText(body);
             Transport transport = session.getTransport("smtp");
@@ -58,17 +68,10 @@ public class MailManager {
             transport.close();
         }
         catch (AddressException ae) {
-            mLogger.error(ae);
+            ae.printStackTrace();
         }
         catch (MessagingException me) {
-        	mLogger.error(me);
+            me.printStackTrace();
         }
-	}
-
-	public static void sendXMasMails(Participant personne) {
-		Participant match = personne.getPreviousMates().get(personne.getPreviousMates().size()-1);
-		String subject = "Loterie de Noel";
-		String body = "    HoHoHo bel enfant !\nAprès une nouvelle année à supporter cette pute de " + match.getPrenom() + " " + match.getNom() + ", et puisque tu as été trop con(conne) popur ne pas t'en débarasser, t'es bon pour lui offrir un cadeau pas trop merdique, disons suffisamment acceptable pour ne pas en avoir honte en lui offrant.\nPour éviter de claquer tout son salaire pour une personne aussi débile, il est de bon ton de ne pas mettre plus de '10-15€' dans le cadeau.\n\nGros Bisous\nPapa Noël <3";
-		publishMail(personne.getMail(), subject, body);
 	}
 }

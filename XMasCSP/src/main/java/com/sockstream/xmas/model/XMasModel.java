@@ -3,7 +3,7 @@ package com.sockstream.xmas.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -12,15 +12,13 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.variables.IntVar;
 import com.sockstream.xmas.mailing.MailManager;
 
 public class XMasModel {
-	private static XMasModel mINSTANCE;
+	private static XMasModel INSTANCE;
 	
 	private boolean mTest = false;
 	private Model mModel;
@@ -28,7 +26,6 @@ public class XMasModel {
 	private boolean mMailTest;
 	private Solution mSolution;
 	private List<Solution> mSolutionList;
-	private static Logger mLogger = LogManager.getLogger(XMasModel.class);
 	
 	private XMasModel()
 	{
@@ -38,106 +35,55 @@ public class XMasModel {
 	
 	public static XMasModel getInstance()
 	{
-		if (mINSTANCE == null)
+		if (INSTANCE == null)
 		{
-			mINSTANCE = new XMasModel();
+			INSTANCE = new XMasModel();
 		}
-		return mINSTANCE;
+		return INSTANCE;
 	}
 
 	public void loadOptions(String[] args) {
+		// TODO Auto-generated method stub
 		Options options = new Options();
 		
 		Option test = new Option("t", "test", false, "test and display result");
 		options.addOption(test);
+		
 		Option mail = new Option("m", "mailTest", false, "send mail to Participants");
 		options.addOption(mail);
+		
 		CommandLineParser parser = new DefaultParser();
 		HelpFormatter formatter = new HelpFormatter();
 		CommandLine cmd;
+		
 		try
 		{
 			cmd = parser.parse(options, args);
 		}
 		catch (ParseException e)
 		{
-			mLogger.error(e.getMessage());
+			System.out.println(e.getMessage());
 			formatter.printHelp("utility-name", options);
+			
 			System.exit(1);
 			return;
 		}
 		mTest = cmd.hasOption("test");
 		mMailTest = cmd.hasOption("mailTest");
+		
 	}
 
 	public void initialize() {
-		Participant clement = new Participant("BEZE", "Clement", "clement.beze@gmail.com");
-		Participant pi = new Participant("BOURDON", "PI", "py.bourdon@gmail.com");
-		Participant julien = new Participant("MAZUREK", "Julien", "mazurek.julien@free.fr");
-		Participant celia = new Participant("ROZAN", "Celia", "celia.rozan@hotmail.fr");
-		Participant maxime = new Participant("MORTIER", "Maxime", "sigmakappa666@gmail.com");
-		Participant lisa = new Participant("BENOTHMANE","Lisa","lisa.benothmane@gmail.com");
-		Participant atri = new Participant("PILIER", "Maxime", "xxxxx");
+		Participant p1 = new Participant("NOM", "Prenom", "mail");
+		Participant p2 = new Participant("Nom2", "Prenom2","mail2");
+		Participant p3 = new Participant("Nom3", "Prenom3", "mail3");
 		
-		celia.setMoitie(julien);
-		julien.setMoitie(celia);
-		maxime.setMoitie(lisa);
-		lisa.setMoitie(maxime);
-
-		//2015
-		pi.getPreviousMates().add(celia);
-		//2016
-		pi.getPreviousMates().add(clement);
-		//2017
-		pi.getPreviousMates().add(julien);
+		//assuming p1 and p3 are in a relationship
+		p1.setMoitie(p3);
+		p3.setMoitie(p1);
 		
-		//2015
-		clement.getPreviousMates().add(julien);
-		//2016
-		clement.getPreviousMates().add(pi);
-		//2017
-		clement.getPreviousMates().add(lisa);
-		
-		//2015
-		celia.getPreviousMates().add(maxime);
-		//2016
-		celia.getPreviousMates().add(maxime);
-		//2017
-		celia.getPreviousMates().add(pi);
-		
-		//2015
-		julien.getPreviousMates().add(atri);
-		//2016
-		julien.getPreviousMates().add(celia);
-		//2017
-		julien.getPreviousMates().add(maxime);
-		
-		//2015
-		lisa.getPreviousMates().add(pi);
-		//2016
-		lisa.getPreviousMates().add(julien);
-		//2017
-		lisa.getPreviousMates().add(clement);
-		
-		//2016
-		maxime.getPreviousMates().add(atri);
-		//2015
-		maxime.getPreviousMates().add(clement);
-		//2017
-		maxime.getPreviousMates().add(celia);
-		
-		//2015
-		atri.getPreviousMates().add(lisa);
-		//2016
-		atri.getPreviousMates().add(lisa);
-		
-		mParticipantList.add(clement);
-		mParticipantList.add(pi);
-		mParticipantList.add(julien);
-		mParticipantList.add(celia);
-		mParticipantList.add(maxime);
-		mParticipantList.add(lisa);
-		mParticipantList.add(atri);
+		//adding previous updates from past christmas
+		p2.getPreviousMates().add(p1);
 
 		int[] possibleValues = new int[mParticipantList.size()];
 		int index = 0;
@@ -164,16 +110,18 @@ public class XMasModel {
 			}
 		}
 		mModel.allDifferent(varArray).post();
+		
 	}
 
 	public Model getModel() {
+		// TODO Auto-generated method stub
 		return mModel; 
 	}
 
-	public void solve() throws ExecutionException {
+	public void solve() throws Exception {
 		List<Solution> solutionList = mModel.getSolver().findAllSolutions();
-		mLogger.info(solutionList.size() + " solutions trouvées");
-		while (!solutionList.isEmpty())
+		System.out.println(solutionList.size() + " solutions trouvées");
+		while (solutionList.size() <=0)
 		{
 			removeOlderMates();
 			solutionList = mModel.getSolver().findAllSolutions();
@@ -182,9 +130,11 @@ public class XMasModel {
 		int randomNum = rand.nextInt(solutionList.size());
 		mSolutionList = solutionList;
 		mSolution = solutionList.get(randomNum);
+		
 	}
 	
-	private void removeOlderMates() throws ExecutionException {
+	private void removeOlderMates() throws Exception {
+		
 		int max = 0;
 		for (Participant personne : mParticipantList)
 		{
@@ -192,7 +142,7 @@ public class XMasModel {
 		}
 		
 		if (max == 0)
-			throw new ExecutionException("Aucune solution possible au problème donné",null);
+			throw new Exception("Aucune solution possible au problème donné");
 		
 
 		for (Participant personne : mParticipantList)
@@ -205,6 +155,7 @@ public class XMasModel {
 	}
 
 	public boolean isTesting() {
+		// TODO Auto-generated method stub
 		return mTest;
 	}
 
@@ -219,33 +170,31 @@ public class XMasModel {
 					if (buddy.getId().getValue() == soluces.getIntVal(personne.getBuddy()))
 						match = buddy;
 				}
-				if (match != null) {
-					mLogger.debug("#" + personne.getPrenom() + " " + personne.getNom() + " -> " + match.getPrenom() + " " + match.getNom());
-				}
-				else {
-					mLogger.error("A null match has been found for : " + personne.getPrenom() + " " + personne.getNom());
-				}
-					
+				System.out.println("#" + personne.getPrenom() + " " + personne.getNom() + " -> " + match.getPrenom() + " " + match.getNom());
 			}
-			mLogger.debug("-----");
+			System.out.println("-----");
 		}
 	}
 
 	public void sendMails() {
+		// TODO Auto-generated method stub
 		for (Participant personne : mParticipantList)
 		{
+			
 			personne.getPreviousMates().add( mParticipantList.get(mSolution.getIntVal(personne.getBuddy())));
 			MailManager.sendXMasMails(personne);
 			
 		}
-		mLogger.info("-----");
+		System.out.println("-----");
 	}
 
 	public boolean isTestingMails() {
+		// TODO Auto-generated method stub
 		return mMailTest;
 	}
 
 	public void sendTestMails() {
+		// TODO Auto-generated method stub
 		for (Participant personne : mParticipantList)
 		{
 			MailManager.sendTestMailTo(personne);
