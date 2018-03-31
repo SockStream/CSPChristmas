@@ -16,10 +16,10 @@ public class MailManager {
 	private static String PASSWORD = "GmailPassword";
 	private static String USER_NAME = "GmailLogin"; //without@gmail.com
 	
+	private MailManager() {
+	}
 	
-	public static void sendTestMailTo(Participant personne) {
-		// TODO Auto-generated method stub
-		
+	public static void sendTestMailTo(Participant personne) {		
 		String subject = "mail Test";
 		String body = "this is a test";
 		
@@ -27,7 +27,6 @@ public class MailManager {
 	}
 
 	public static void sendXMasMails(Participant personne) {
-		// TODO Auto-generated method stub
 		Participant match = personne.getPreviousMates().get(personne.getPreviousMates().size()-1);
 		String subject = "mail subject";
 		String body = "mailBody";

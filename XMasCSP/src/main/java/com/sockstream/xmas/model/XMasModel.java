@@ -3,8 +3,7 @@ package com.sockstream.xmas.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
-
+import java.util.concurrent.ExecutionException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -84,6 +83,10 @@ public class XMasModel {
 		
 		//adding previous updates from past christmas
 		p2.getPreviousMates().add(p1);
+		
+		mParticipantList.add(p1);
+		mParticipantList.add(p2);
+		mParticipantList.add(p3);
 
 		int[] possibleValues = new int[mParticipantList.size()];
 		int index = 0;
@@ -118,10 +121,10 @@ public class XMasModel {
 		return mModel; 
 	}
 
-	public void solve() throws Exception {
+	public void solve() throws ExecutionException {
 		List<Solution> solutionList = mModel.getSolver().findAllSolutions();
 		System.out.println(solutionList.size() + " solutions trouvées");
-		while (solutionList.size() <=0)
+		while (solutionList.isEmpty())
 		{
 			removeOlderMates();
 			solutionList = mModel.getSolver().findAllSolutions();
@@ -133,7 +136,7 @@ public class XMasModel {
 		
 	}
 	
-	private void removeOlderMates() throws Exception {
+	private void removeOlderMates() throws ExecutionException {
 		
 		int max = 0;
 		for (Participant personne : mParticipantList)
@@ -142,7 +145,7 @@ public class XMasModel {
 		}
 		
 		if (max == 0)
-			throw new Exception("Aucune solution possible au problème donné");
+			throw new ExecutionException("Aucune solution possible au problème donné",null);
 		
 
 		for (Participant personne : mParticipantList)
