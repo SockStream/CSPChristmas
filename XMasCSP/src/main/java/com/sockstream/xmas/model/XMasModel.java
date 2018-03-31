@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
+import org.apache.logging.log4j.LogManager;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -11,13 +13,15 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.logging.log4j.Logger;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.variables.IntVar;
 import com.sockstream.xmas.mailing.MailManager;
 
 public class XMasModel {
-	private static XMasModel INSTANCE;
+	private static XMasModel mINSTANCE;
+	private static Logger mLOGGER = LogManager.getLogger(XMasModel.class);
 	
 	private boolean mTest = false;
 	private Model mModel;
@@ -34,11 +38,11 @@ public class XMasModel {
 	
 	public static XMasModel getInstance()
 	{
-		if (INSTANCE == null)
+		if (mINSTANCE == null)
 		{
-			INSTANCE = new XMasModel();
+			mINSTANCE = new XMasModel();
 		}
-		return INSTANCE;
+		return mINSTANCE;
 	}
 
 	public void loadOptions(String[] args) {
@@ -173,9 +177,14 @@ public class XMasModel {
 					if (buddy.getId().getValue() == soluces.getIntVal(personne.getBuddy()))
 						match = buddy;
 				}
-				System.out.println("#" + personne.getPrenom() + " " + personne.getNom() + " -> " + match.getPrenom() + " " + match.getNom());
+				if (match != null) {
+					mLOGGER.debug("#" + personne.getPrenom() + " " + personne.getNom() + " -> " + match.getPrenom() + " " + match.getNom());
+				}
+				else {
+					mLOGGER.error("No match has been found for user : " + personne.getPrenom() + " " + personne.getPrenom());
+				}
 			}
-			System.out.println("-----");
+			mLOGGER.debug("-----");
 		}
 	}
 
@@ -188,7 +197,7 @@ public class XMasModel {
 			MailManager.sendXMasMails(personne);
 			
 		}
-		System.out.println("-----");
+		mLOGGER.info("-----");
 	}
 
 	public boolean isTestingMails() {
