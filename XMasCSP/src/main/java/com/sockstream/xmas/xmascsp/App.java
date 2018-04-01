@@ -25,6 +25,7 @@ public class App
     	else
     	{
     		model.sendMails();
+    		model.save();
     	}
     	
     }

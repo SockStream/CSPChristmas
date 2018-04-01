@@ -1,5 +1,10 @@
 package com.sockstream.xmas.model;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -17,6 +22,10 @@ import org.apache.logging.log4j.Logger;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.variables.IntVar;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.sockstream.xmas.mailing.MailManager;
 
 public class XMasModel {
@@ -24,6 +33,7 @@ public class XMasModel {
 	private static Logger mLOGGER = LogManager.getLogger(XMasModel.class);
 	
 	private boolean mTest = false;
+	private String mInputFilePath;
 	private Model mModel;
 	private List<Participant> mParticipantList;
 	private boolean mMailTest;
@@ -54,6 +64,10 @@ public class XMasModel {
 		Option mail = new Option("m", "mailTest", false, "send mail to Participants");
 		options.addOption(mail);
 		
+		Option file = new Option("i", "inputFile", true, "path of input file containing configuration");
+		file.setRequired(true);
+		options.addOption(file);
+		
 		CommandLineParser parser = new DefaultParser();
 		HelpFormatter formatter = new HelpFormatter();
 		CommandLine cmd;
@@ -72,25 +86,13 @@ public class XMasModel {
 		}
 		mTest = cmd.hasOption("test");
 		mMailTest = cmd.hasOption("mailTest");
+		mInputFilePath = cmd.getOptionValue("inputFile");
 		
 	}
 
 	public void initialize() {
-		Participant p1 = new Participant("NOM", "Prenom", "mail");
-		Participant p2 = new Participant("Nom2", "Prenom2","mail2");
-		Participant p3 = new Participant("Nom3", "Prenom3", "mail3");
+		loadFromInputFile();
 		
-		//assuming p1 and p3 are in a relationship
-		p1.setMoitie(p3);
-		p3.setMoitie(p1);
-		
-		//adding previous updates from past christmas
-		p2.getPreviousMates().add(p1);
-		
-		mParticipantList.add(p1);
-		mParticipantList.add(p2);
-		mParticipantList.add(p3);
-
 		int[] possibleValues = new int[mParticipantList.size()];
 		int index = 0;
 		for (Participant personne : mParticipantList)
@@ -110,12 +112,52 @@ public class XMasModel {
 				mModel.arithm(personne.getBuddy(),"!=",personne.getMoitie().getId()).post();
 			}
 			
-			for (Participant previous : personne.getPreviousMates())
+			for (IntVar previous : personne.getPreviousMates())
 			{
-				mModel.arithm(personne.getBuddy(), "!=", previous.getId()).post();
+				mModel.arithm(personne.getBuddy(), "!=", previous).post();
 			}
 		}
 		mModel.allDifferent(varArray).post();
+		
+	}
+
+	private void loadFromInputFile() {
+		Participant p1 = new Participant("NOM", "Prenom", "mail");
+		Participant p2 = new Participant("Nom2", "Prenom2","mail2");
+		Participant p3 = new Participant("Nom3", "Prenom3", "mail3");
+		
+		//assuming p1 and p3 are in a relationship
+		p1.setMoitie(p3.getId());
+		p3.setMoitie(p1.getId());
+		
+		//adding previous updates from past christmas
+		p2.getPreviousMates().add(p1.getId());
+		
+		mParticipantList.add(p1);
+		mParticipantList.add(p2);
+		mParticipantList.add(p3);
+		
+		FileReader fileReader = null;
+		try {
+			fileReader = new FileReader(mInputFilePath);
+			GsonBuilder builder = new GsonBuilder();
+			Type listType = new TypeToken<ArrayList<Participant>>(){}.getType();
+			Gson gson = builder.create();
+			mParticipantList = gson.fromJson(fileReader,listType);
+		} catch (FileNotFoundException e) {
+			mLOGGER.error(e);
+			System.exit(2);
+		}
+		finally {
+			if (fileReader != null) {
+				try {
+					fileReader.close();
+				} catch (IOException e) {
+					mLOGGER.error(e);
+				}
+			}
+		}
+		
 		
 	}
 
@@ -135,7 +177,6 @@ public class XMasModel {
 		int randomNum = rand.nextInt(solutionList.size());
 		mSolutionList = solutionList;
 		mSolution = solutionList.get(randomNum);
-		
 	}
 	
 	private void removeOlderMates() throws ExecutionException {
@@ -145,10 +186,10 @@ public class XMasModel {
 			max = Math.max(max,personne.getPreviousMates().size());
 		}
 		
-		if (max == 0)
+		if (max == 0) {
 			throw new ExecutionException("Aucune solution possible au problème donné",null);
+		}
 		
-
 		for (Participant personne : mParticipantList)
 		{
 			if (personne.getPreviousMates().size() == max)
@@ -186,11 +227,9 @@ public class XMasModel {
 
 	public void sendMails() {
 		for (Participant personne : mParticipantList)
-		{
-			
-			personne.getPreviousMates().add( mParticipantList.get(mSolution.getIntVal(personne.getBuddy())));
+		{			
+			personne.getPreviousMates().add( mParticipantList.get(mSolution.getIntVal(personne.getBuddy())).getId());
 			MailManager.sendXMasMails(personne);
-			
 		}
 		mLOGGER.info("-----");
 	}
@@ -204,5 +243,29 @@ public class XMasModel {
 		{
 			MailManager.sendTestMailTo(personne);
 		}
+	}
+
+	public void save() {
+		GsonBuilder builder = new GsonBuilder();
+		Gson gson = builder.create();
+		String jsonString = gson.toJson(mParticipantList);
+		FileWriter writer = null;
+		try {
+			writer = new FileWriter(mInputFilePath);
+			writer.write(jsonString);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally {
+			if (writer != null) {
+				try {
+					writer.close();
+				} catch (IOException e) {
+					mLOGGER.error(e);
+				}
+			}
+		}
+		
 	}
 }

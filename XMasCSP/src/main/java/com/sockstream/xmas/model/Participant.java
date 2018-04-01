@@ -9,8 +9,8 @@ public class Participant {
 	private String mNom;
 	private String mPrenom;
 	private String mMail;
-	private Participant mMoitie;
-	private List<Participant> mPreviousMates;
+	private IntVar mMoitie;
+	private List<IntVar> mPreviousMates;
 	private IntVar mId;
 	private IntVar mBuddyId;
 	
@@ -22,7 +22,7 @@ public class Participant {
 		mPrenom = prenom;
 		mMail = mail;
 		mMoitie = null;
-		mPreviousMates = new ArrayList<Participant>();
+		mPreviousMates = new ArrayList<IntVar>();
 		mId = XMasModel.getInstance().getModel().intVar(compteur);
 		compteur ++;
 	}
@@ -32,7 +32,7 @@ public class Participant {
 		mPrenom = prenom;
 		mMail = mail;
 		mMoitie = null;
-		mPreviousMates = new ArrayList<Participant>();
+		mPreviousMates = new ArrayList<IntVar>();
 		mId = XMasModel.getInstance().getModel().intVar(id);
 	}
 
@@ -81,28 +81,28 @@ public class Participant {
 	/**
 	 * @return the moitie
 	 */
-	public Participant getMoitie() {
+	public IntVar getMoitie() {
 		return mMoitie;
 	}
 
 	/**
 	 * @param moitie the moitie to set
 	 */
-	public void setMoitie(Participant moitie) {
+	public void setMoitie(IntVar moitie) {
 		this.mMoitie = moitie;
 	}
 
 	/**
 	 * @return the previousMates
 	 */
-	public List<Participant> getPreviousMates() {
+	public List<IntVar> getPreviousMates() {
 		return mPreviousMates;
 	}
 
 	/**
 	 * @param previousMates the previousMates to set
 	 */
-	public void setPreviousMates(List<Participant> previousMates) {
+	public void setPreviousMates(List<IntVar> previousMates) {
 		this.mPreviousMates = previousMates;
 	}
 
