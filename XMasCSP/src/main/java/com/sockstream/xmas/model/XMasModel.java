@@ -22,7 +22,6 @@ import org.apache.logging.log4j.Logger;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.variables.IntVar;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -32,18 +31,23 @@ public class XMasModel {
 	private static XMasModel mINSTANCE;
 	private static Logger mLOGGER = LogManager.getLogger(XMasModel.class);
 	
+	private MailManager mMailManager;
 	private boolean mTest = false;
 	private String mInputFilePath;
 	private Model mModel;
 	private List<Participant> mParticipantList;
+	private List<Participant> mSavedList;
 	private boolean mMailTest;
 	private Solution mSolution;
 	private List<Solution> mSolutionList;
+	private IntVar[] varArray;
 	
 	private XMasModel()
 	{
 		mModel  = new Model("XMas Solver");
+		mMailManager = new MailManager();
 		mParticipantList = new ArrayList<Participant>();
+		mSavedList = new ArrayList<Participant>();
 	}
 	
 	public static XMasModel getInstance()
@@ -87,7 +91,6 @@ public class XMasModel {
 		mTest = cmd.hasOption("test");
 		mMailTest = cmd.hasOption("mailTest");
 		mInputFilePath = cmd.getOptionValue("inputFile");
-		
 	}
 
 	public void initialize() {
@@ -97,53 +100,36 @@ public class XMasModel {
 		int index = 0;
 		for (Participant personne : mParticipantList)
 		{
-			possibleValues[index] = personne.getId().getValue();
+			possibleValues[index] = personne.getId();
 			index ++;
 		}
-		IntVar[] varArray = mModel.intVarArray(possibleValues.length, possibleValues);
+		varArray = mModel.intVarArray(possibleValues.length, possibleValues);
 		
 		for (Participant personne : mParticipantList)
 		{
-			personne.setBuddy(varArray[mParticipantList.indexOf(personne)]);
 			
-			mModel.arithm(personne.getBuddy(),"!=",personne.getId()).post();
+			mModel.arithm(varArray[mParticipantList.indexOf(personne)],"!=",personne.getId()).post();
 			if (personne.getMoitie() != null)
 			{
-				mModel.arithm(personne.getBuddy(),"!=",personne.getMoitie().getId()).post();
+				mModel.arithm(varArray[mParticipantList.indexOf(personne)],"!=",personne.getMoitie()).post();
 			}
 			
-			for (IntVar previous : personne.getPreviousMates())
+			for (int previous : personne.getPreviousMates())
 			{
-				mModel.arithm(personne.getBuddy(), "!=", previous).post();
+				mModel.arithm(varArray[mParticipantList.indexOf(personne)], "!=", previous).post();
 			}
 		}
 		mModel.allDifferent(varArray).post();
-		
 	}
 
 	private void loadFromInputFile() {
-		Participant p1 = new Participant("NOM", "Prenom", "mail");
-		Participant p2 = new Participant("Nom2", "Prenom2","mail2");
-		Participant p3 = new Participant("Nom3", "Prenom3", "mail3");
-		
-		//assuming p1 and p3 are in a relationship
-		p1.setMoitie(p3.getId());
-		p3.setMoitie(p1.getId());
-		
-		//adding previous updates from past christmas
-		p2.getPreviousMates().add(p1.getId());
-		
-		mParticipantList.add(p1);
-		mParticipantList.add(p2);
-		mParticipantList.add(p3);
-		
 		FileReader fileReader = null;
 		try {
 			fileReader = new FileReader(mInputFilePath);
 			GsonBuilder builder = new GsonBuilder();
 			Type listType = new TypeToken<ArrayList<Participant>>(){}.getType();
 			Gson gson = builder.create();
-			mParticipantList = gson.fromJson(fileReader,listType);
+			mSavedList = gson.fromJson(fileReader,listType);
 		} catch (FileNotFoundException e) {
 			mLOGGER.error(e);
 			System.exit(2);
@@ -157,8 +143,12 @@ public class XMasModel {
 				}
 			}
 		}
-		
-		
+		for (Participant personne : mSavedList)
+		{
+			if (personne.isPresent()) {
+				mParticipantList.add(personne);
+			}
+		}
 	}
 
 	public Model getModel() {
@@ -209,10 +199,10 @@ public class XMasModel {
 			for (Participant personne : mParticipantList)
 			{
 				Participant match = null;
-				for (Participant buddy : mParticipantList)
+				for (Participant probableMatch : mParticipantList)
 				{
-					if (buddy.getId().getValue() == soluces.getIntVal(personne.getBuddy()))
-						match = buddy;
+					if (probableMatch.getId() == soluces.getIntVal(varArray[mParticipantList.indexOf(personne)])) // .getIntVal(personne.getBuddy()))
+						match = probableMatch;
 				}
 				if (match != null) {
 					mLOGGER.debug("#" + personne.getPrenom() + " " + personne.getNom() + " -> " + match.getPrenom() + " " + match.getNom());
@@ -228,8 +218,8 @@ public class XMasModel {
 	public void sendMails() {
 		for (Participant personne : mParticipantList)
 		{			
-			personne.getPreviousMates().add( mParticipantList.get(mSolution.getIntVal(personne.getBuddy())).getId());
-			MailManager.sendXMasMails(personne);
+			personne.getPreviousMates().add( mParticipantList.get(mSolution.getIntVal(varArray[mParticipantList.indexOf(personne)])).getId());
+			mMailManager.sendXMasMails(personne);
 		}
 		mLOGGER.info("-----");
 	}
@@ -241,21 +231,21 @@ public class XMasModel {
 	public void sendTestMails() {
 		for (Participant personne : mParticipantList)
 		{
-			MailManager.sendTestMailTo(personne);
+			mMailManager.sendTestMailTo(personne);
 		}
 	}
 
 	public void save() {
+		
 		GsonBuilder builder = new GsonBuilder();
 		Gson gson = builder.create();
-		String jsonString = gson.toJson(mParticipantList);
+		String jsonString = gson.toJson(mSavedList);
 		FileWriter writer = null;
 		try {
 			writer = new FileWriter(mInputFilePath);
 			writer.write(jsonString);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			mLOGGER.error(e);
 		}
 		finally {
 			if (writer != null) {
@@ -266,6 +256,5 @@ public class XMasModel {
 				}
 			}
 		}
-		
 	}
 }

@@ -1,0 +1,9 @@
+[
+	{"mNom":"NAME1","mPrenom":"FirstName1","mMail":"mail1@wannabe.com","mPreviousMates":[6,3],"mId":0,"isPresent":true},
+	{"mNom":"NAME2","mPrenom":"FirstName2","mMail":"mail2@wannabe.com","mPreviousMates":[0,3],"mId":1,"isPresent":true},
+	{"mNom":"NAME3","mPrenom":"FirstName3","mMail":"mail3@wannabe.com","mPreviousMates":[6],"mId":2,"isPresent":true},
+	{"mNom":"NAME4","mPrenom":"FirstName4","mMail":"mail4@wannabe.com","mMoitie":4,"mPreviousMates":[4,5],"mId":3,"isPresent":true},
+	{"mNom":"NAME5","mPrenom":"FirstName5","mMail":"mail5@wannabe.com","mMoitie":3,"mPreviousMates":[1],"mId":4,"isPresent":true},
+	{"mNom":"NAME6","mPrenom":"FirstName6","mMail":"mail6@wannabe.com","mMoitie":6,"mPreviousMates":[0,4],"mId":5,"isPresent":true},
+	{"mNom":"NAME7","mPrenom":"FirstName7","mMail":"mail7@wannabe.com","mMoitie":5,"mPreviousMates":[0,2],"mId":6,"isPresent":true}
+]

@@ -1,18 +1,21 @@
 package com.sockstream.xmas.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.chocosolver.solver.variables.IntVar;
-
-public class Participant {
+public class Participant implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 647126051541892434L;
 	private String mNom;
 	private String mPrenom;
 	private String mMail;
-	private IntVar mMoitie;
-	private List<IntVar> mPreviousMates;
-	private IntVar mId;
-	private IntVar mBuddyId;
+	private Integer mMoitie;
+	private List<Integer> mPreviousMates;
+	private int mId;
+	private boolean isPresent;
 	
 	private static int compteur = 0;
 	
@@ -22,8 +25,9 @@ public class Participant {
 		mPrenom = prenom;
 		mMail = mail;
 		mMoitie = null;
-		mPreviousMates = new ArrayList<IntVar>();
-		mId = XMasModel.getInstance().getModel().intVar(compteur);
+		mPreviousMates = new ArrayList<Integer>();
+		mId = compteur;
+		setPresent(true);
 		compteur ++;
 	}
 
@@ -32,8 +36,9 @@ public class Participant {
 		mPrenom = prenom;
 		mMail = mail;
 		mMoitie = null;
-		mPreviousMates = new ArrayList<IntVar>();
-		mId = XMasModel.getInstance().getModel().intVar(id);
+		mPreviousMates = new ArrayList<Integer>();
+		mId = id;
+		setPresent(true);
 	}
 
 	/**
@@ -81,56 +86,50 @@ public class Participant {
 	/**
 	 * @return the moitie
 	 */
-	public IntVar getMoitie() {
+	public Integer getMoitie() {
 		return mMoitie;
 	}
 
 	/**
 	 * @param moitie the moitie to set
 	 */
-	public void setMoitie(IntVar moitie) {
+	public void setMoitie(Integer moitie) {
 		this.mMoitie = moitie;
 	}
 
 	/**
 	 * @return the previousMates
 	 */
-	public List<IntVar> getPreviousMates() {
+	public List<Integer> getPreviousMates() {
 		return mPreviousMates;
 	}
 
 	/**
 	 * @param previousMates the previousMates to set
 	 */
-	public void setPreviousMates(List<IntVar> previousMates) {
+	public void setPreviousMates(List<Integer> previousMates) {
 		this.mPreviousMates = previousMates;
 	}
 
 	/**
 	 * @return the id
 	 */
-	public IntVar getId() {
+	public int getId() {
 		return mId;
 	}
 
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(IntVar id) {
+	public void setId(int id) {
 		mId = id;
 	}
 
-	/**
-	 * @return the mBuddy
-	 */
-	public IntVar getBuddy() {
-		return mBuddyId;
+	public boolean isPresent() {
+		return isPresent;
 	}
 
-	/**
-	 * @param mBuddy the mBuddy to set
-	 */
-	public void setBuddy(IntVar mBuddyId) {
-		this.mBuddyId = mBuddyId;
+	public void setPresent(boolean isPresent) {
+		this.isPresent = isPresent;
 	}
 }
