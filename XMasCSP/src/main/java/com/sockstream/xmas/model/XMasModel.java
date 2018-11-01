@@ -44,7 +44,6 @@ public class XMasModel {
 	
 	private XMasModel()
 	{
-		mModel  = new Model("XMas Solver");
 		mMailManager = new MailManager();
 		mParticipantList = new ArrayList<Participant>();
 		mSavedList = new ArrayList<Participant>();
@@ -94,8 +93,8 @@ public class XMasModel {
 	}
 
 	public void initialize() {
-		loadFromInputFile();
-		
+
+		mModel  = new Model("XMas Solver");
 		int[] possibleValues = new int[mParticipantList.size()];
 		int index = 0;
 		for (Participant personne : mParticipantList)
@@ -122,7 +121,7 @@ public class XMasModel {
 		mModel.allDifferent(varArray).post();
 	}
 
-	private void loadFromInputFile() {
+	public void loadFromInputFile() {
 		FileReader fileReader = null;
 		try {
 			fileReader = new FileReader(mInputFilePath);
@@ -161,7 +160,9 @@ public class XMasModel {
 		while (solutionList.isEmpty())
 		{
 			removeOlderMates();
+			initialize();
 			solutionList = mModel.getSolver().findAllSolutions();
+			mLOGGER.info(solutionList.size() + " solutions trouvées");
 		}
 		Random rand = new Random();
 		int randomNum = rand.nextInt(solutionList.size());

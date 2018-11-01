@@ -7,7 +7,7 @@ public class App
     {
     	XMasModel model = XMasModel.getInstance();
     	model.loadOptions(args);
-    	
+    	model.loadFromInputFile();
     	model.initialize();
     	
     	if (model.isTestingMails())
