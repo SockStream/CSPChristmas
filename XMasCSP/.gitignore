@@ -1,3 +1,5 @@
 /target/
 /out.json.save
 /logfile.log
+/config.json_capgemini
+/config.json.new

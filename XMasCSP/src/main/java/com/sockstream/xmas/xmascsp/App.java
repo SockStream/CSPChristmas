@@ -18,14 +18,18 @@ public class App
     	
     	model.solve();
     	
+    	model.saveSolution();
+    	
     	if (model.isTesting())
     	{
     		model.printSolutions();
+    		model.printSavedSolution();
     	}
     	else
     	{
+    		model.printSavedSolution();
     		model.sendMails();
-    		model.save();
+    		model.saveToOutPutFile();
     	}
     	
     }

@@ -53,14 +53,17 @@ public class MailManager {
 	
 	public void sendTestMailTo(Participant personne) {		
 		String subject = "mail Test";
-		String body = "this is a test";
+		String body = MailConstantes.BODY;
 		
 		publishMail(personne.getMail(),subject,body);
 	}
 
-	public void sendXMasMails(Participant personne) {
-		String subject = "mail subject";
-		String body = "mailBody";
+	public void sendXMasMails(Participant personne, Participant designee) {
+		String subject = MailConstantes.OBJET;
+		String body = MailConstantes.BODY;
+		body = body.replaceAll(MailConstantes.USER_NAME, personne.getPrenom());
+		
+		body = body.replaceAll(MailConstantes.PERSONNE_DESIGNEE, designee.getPrenom() + " " + designee.getNom());
 		publishMail(personne.getMail(), subject, body);
 	}
 
@@ -91,7 +94,8 @@ public class MailManager {
             }
 
             message.setSubject(subject);
-            message.setText(body);
+            message.setContent(body, "text/html; charset=utf-8");
+            //message.setText(body);
             Transport transport = session.getTransport("smtp");
             transport.connect(host, mUSERNAME, mPASSWD);
             transport.sendMessage(message, message.getAllRecipients());

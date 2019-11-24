@@ -215,12 +215,35 @@ public class XMasModel {
 			mLOGGER.debug("-----");
 		}
 	}
+	
+	public void printSavedSolution()
+	{
+		for (Participant personne : mParticipantList)
+		{
+			Participant match = null;
+			for (Participant probableMatch : mParticipantList)
+			{
+				if (personne.getPreviousMates().get(personne.getPreviousMates().size()-1) == probableMatch.getId())
+					match = probableMatch;
+			}
+			if (match != null) {
+				mLOGGER.debug("#" + personne.getPrenom() + " " + personne.getNom() + " -> " + match.getPrenom() + " " + match.getNom());
+			}
+		}
+	}
 
 	public void sendMails() {
 		for (Participant personne : mParticipantList)
-		{			
-			personne.getPreviousMates().add( mParticipantList.get(mSolution.getIntVal(varArray[mParticipantList.indexOf(personne)])).getId());
-			mMailManager.sendXMasMails(personne);
+		{
+			Participant designe = null;
+			for (Participant participant : mParticipantList)
+			{
+				if (participant.getId() == personne.getPreviousMates().get(personne.getPreviousMates().size()-1))
+				{
+					designe = participant;
+				}
+			}
+			mMailManager.sendXMasMails(personne,designe);
 		}
 		mLOGGER.info("-----");
 	}
@@ -230,20 +253,21 @@ public class XMasModel {
 	}
 
 	public void sendTestMails() {
-		for (Participant personne : mParticipantList)
+		/*for (Participant personne : mParticipantList)
 		{
 			mMailManager.sendTestMailTo(personne);
-		}
+		}*/
+		mMailManager.sendTestMailTo(mParticipantList.get(0));
 	}
 
-	public void save() {
+	public void saveToOutPutFile() {
 		
 		GsonBuilder builder = new GsonBuilder();
 		Gson gson = builder.create();
 		String jsonString = gson.toJson(mSavedList);
 		FileWriter writer = null;
 		try {
-			writer = new FileWriter(mInputFilePath);
+			writer = new FileWriter(mInputFilePath+".new");
 			writer.write(jsonString);
 		} catch (IOException e) {
 			mLOGGER.error(e);
@@ -256,6 +280,17 @@ public class XMasModel {
 					mLOGGER.error(e);
 				}
 			}
+		}
+	}
+
+	public void saveSolution() {
+		int i = 0;
+		for (Participant personne : mParticipantList)
+		{
+			int id_designe = mSolution.getIntVal(varArray[mParticipantList.indexOf(personne)]);
+			
+			personne.getPreviousMates().add( id_designe);
+			i++;
 		}
 	}
 }
