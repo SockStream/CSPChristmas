@@ -1,5 +1,6 @@
 package com.sockstream.xmas.mailing;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +30,10 @@ public class MailManager {
 		
 		try {
 
-	        inputStream = new FileInputStream("config.properties");
+			//File file = new File("config.properties");
+			//mLOGGER.debug(file.getAbsolutePath());
+			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+	        inputStream = classLoader.getResourceAsStream("config.properties");
 
 	        // load a properties file
 	        properties.load(inputStream);

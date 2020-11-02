@@ -84,7 +84,7 @@ public class XMasModel {
 			mLOGGER.error(e);
 			formatter.printHelp("utility-name", options);
 			
-			System.exit(1);
+				System.exit(1);
 			return;
 		}
 		mTest = cmd.hasOption("test");

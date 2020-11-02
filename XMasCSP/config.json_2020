@@ -1,0 +1,76 @@
+[
+	{
+		"mNom": "BEZE",
+		"mPrenom": "Clément",
+		"mMail": "clement.beze@gmail.com",
+		"mPreviousMates": [
+			3
+		],
+		"mId": 0,
+		"isPresent": true
+	},
+	{
+		"mNom": "BOURDON",
+		"mPrenom": "Py",
+		"mMail": "py.bourdon@gmail.com",
+		"mPreviousMates": [
+			2
+		],
+		"mId": 1,
+		"isPresent": true
+	},
+	{
+		"mNom": "MAZUREK",
+		"mPrenom": "Julien",
+		"mMail": "mazurek.julien@free.fr",
+		"mMoitie": 3,
+		"mPreviousMates": [
+			0
+		],
+		"mId": 2,
+		"isPresent": true
+	},
+	{
+		"mNom": "ROZAN",
+		"mPrenom": "Celia",
+		"mMail": "celia.rozan@hotmail.fr",
+		"mMoitie": 2,
+		"mPreviousMates": [
+			6
+		],
+		"mId": 3,
+		"isPresent": true
+	},
+	{
+		"mNom": "MORTIER",
+		"mPrenom": "Maxime",
+		"mMail": "sigmakappa666@gmail.com",
+		"mMoitie": 5,
+		"mPreviousMates": [
+			
+		],
+		"mId": 4,
+		"isPresent": true
+	},
+	{
+		"mNom": "BENOTHMANE",
+		"mPrenom": "Lisa",
+		"mMail": "lisa.benothmane@gmail.com",
+		"mMoitie": 4,
+		"mPreviousMates": [
+			
+		],
+		"mId": 5,
+		"isPresent": false
+	},
+	{
+		"mNom": "PILIER",
+		"mPrenom": "Maxime",
+		"mMail": "Maximepl@gmail.com",
+		"mPreviousMates": [
+			1
+		],
+		"mId": 6,
+		"isPresent": true
+	}
+]

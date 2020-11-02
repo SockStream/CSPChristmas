@@ -189,5 +189,5 @@ public class MailConstantes {
 			"</body>";
 	public static String USER_NAME = "%USER_NAME%";
 	public static String PERSONNE_DESIGNEE = "%NOM_DE_LA_PERSONNE%";
-	public static String OBJET = "Secret Santa 2019-2020";
+	public static String OBJET = "Secret Santa 2020-2021";
 }
