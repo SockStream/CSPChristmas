@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -41,15 +43,19 @@ public class XMasModel {
 	private Solution mSolution;
 	private List<Solution> mSolutionList;
 	private IntVar[] varArray;
+
+	private Random rand = null;
 	
-	private XMasModel()
+	private XMasModel() throws NoSuchAlgorithmException
 	{
 		mMailManager = new MailManager();
 		mParticipantList = new ArrayList<Participant>();
 		mSavedList = new ArrayList<Participant>();
+
+		rand = SecureRandom.getInstanceStrong();
 	}
 	
-	public static XMasModel getInstance()
+	public static XMasModel getInstance() throws NoSuchAlgorithmException
 	{
 		if (mINSTANCE == null)
 		{
@@ -164,7 +170,6 @@ public class XMasModel {
 			solutionList = mModel.getSolver().findAllSolutions();
 			mLOGGER.info(solutionList.size() + " solutions trouvées");
 		}
-		Random rand = new Random();
 		int randomNum = rand.nextInt(solutionList.size());
 		mSolutionList = solutionList;
 		mSolution = solutionList.get(randomNum);
