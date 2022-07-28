@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
+
+import javax.mail.MessagingException;
+
 import org.apache.logging.log4j.LogManager;
 
 import org.apache.commons.cli.CommandLine;
@@ -24,6 +27,8 @@ import org.apache.logging.log4j.Logger;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.variables.IntVar;
+
+import com.google.api.services.gmail.Gmail;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -94,12 +99,13 @@ public class XMasModel {
 			return;
 		}
 		mTest = cmd.hasOption("test");
+		mTest = true;
 		mMailTest = cmd.hasOption("mailTest");
 		mInputFilePath = cmd.getOptionValue("inputFile");
 	}
 
-	public void initialize() {
-
+	public void initialize() throws IOException, MessagingException {
+		MailManager.getGMailService();
 		mModel  = new Model("XMas Solver");
 		int[] possibleValues = new int[mParticipantList.size()];
 		int index = 0;
@@ -160,7 +166,7 @@ public class XMasModel {
 		return mModel; 
 	}
 
-	public void solve() throws ExecutionException {
+	public void solve() throws ExecutionException, IOException, MessagingException {
 		List<Solution> solutionList = mModel.getSolver().findAllSolutions();
 		mLOGGER.info(solutionList.size() + " solutions trouvées");
 		while (solutionList.isEmpty())
@@ -237,7 +243,8 @@ public class XMasModel {
 		}
 	}
 
-	public void sendMails() {
+	public void sendMails() throws IOException, MessagingException {
+		Gmail service = MailManager.getGMailService();
 		for (Participant personne : mParticipantList)
 		{
 			Participant designe = null;
@@ -257,12 +264,14 @@ public class XMasModel {
 		return mMailTest;
 	}
 
-	public void sendTestMails() {
-		/*for (Participant personne : mParticipantList)
+	public void sendTestMails() throws MessagingException, IOException {
+		for (Participant personne : mParticipantList)
 		{
-			mMailManager.sendTestMailTo(personne);
-		}*/
-		mMailManager.sendTestMailTo(mParticipantList.get(0));
+			if (personne.getNom().toUpperCase().equalsIgnoreCase("BEZE"))
+			{
+				mMailManager.sendTestMailTo(personne);
+			}
+		}
 	}
 
 	public void saveToOutPutFile() {
@@ -289,13 +298,11 @@ public class XMasModel {
 	}
 
 	public void saveSolution() {
-		int i = 0;
 		for (Participant personne : mParticipantList)
 		{
 			int id_designe = mSolution.getIntVal(varArray[mParticipantList.indexOf(personne)]);
 			
 			personne.getPreviousMates().add( id_designe);
-			i++;
 		}
 	}
 }

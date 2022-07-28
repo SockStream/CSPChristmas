@@ -24,6 +24,7 @@ public class App
     	{
     		model.printSolutions();
     		model.printSavedSolution();
+    		model.sendMails();
     	}
     	else
     	{
